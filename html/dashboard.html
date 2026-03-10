@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dashboard</title>
+</head>
+<body>
+  <form id="exerciseForm">
+    <input type="text" id="name" placeholder="exercise name" required />
+    <input type="number" id="sets" placeholder="sets" required />
+    <input type="number" id="reps" placeholder="reps" required />
+    <input type="number" id="weight" placeholder="weight" required />
+    <button type="submit">Add</button>
+  </form>
+
+ <ul id="list"></ul>
+
+  <script>
+  const token = localStorage.getItem("token");
+  if (!token) window.location.href = "login.html";
+
+  const list = document.getElementById("list");
+
+  async function loadExercises() {
+    const res = await fetch("http://127.0.0.1:8000/api/users/me/exercises/", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    const data = await res.json();
+    list.innerHTML = "";
+
+    data.forEach((ex) => {
+      const li = document.createElement("li");
+      li.textContent = `${ex.name} | ${ex.sets}x${ex.reps} @ ${ex.weight}`;
+
+      const btn = document.createElement("button");
+      btn.textContent = "Delete";
+      btn.onclick = async () => {
+        await fetch(
+          `http://127.0.0.1:8000/api/users/me/exercises/${ex.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+        loadExercises();
+      };
+
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById("exerciseForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const body = {
+      name: name.value,
+      sets: parseInt(sets.value),
+      reps: parseInt(reps.value),
+      weight: parseFloat(weight.value),
+    };
+
+    const res = await fetch("http://127.0.0.1:8000/api/users/me/exercises/", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    console.log("STATUS:", res.status);
+    const text = await res.text();
+    console.log("BODY:", text);
+
+    e.target.reset();
+    loadExercises();
+  });
+
+  loadExercises();
+</script>
+</body>
+</html>
+
+
