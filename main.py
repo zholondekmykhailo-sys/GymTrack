@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
+import datetime
 from datetime import timedelta
 from sqlalchemy.orm import Session
 from database_setup import User, Exercise, get_db
@@ -91,6 +92,8 @@ def add_exercise(
         weight = exercise.weight,
         user_id = current_user.id
     )
+
+    print(new_exercise.date)
     db.add(new_exercise)
     db.commit()
     db.refresh(new_exercise)
@@ -135,7 +138,13 @@ def update_exercise(
 
     return exercise
 
-
+@app.get('/api/users/me/exercises/', response_model=list[Exersice_Response])
+def get_exercises(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+    ):
+    exercises = db.query(Exercise).filter(Exercise.user_id == current_user.id).all()
+    return exercises
 
 
 

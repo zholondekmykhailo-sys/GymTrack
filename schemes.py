@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from datetime import datetime
 
 
 class Exersice_Response(BaseModel):
@@ -8,6 +9,7 @@ class Exersice_Response(BaseModel):
     sets: Optional[int] = None
     reps: Optional[int] = None
     weight: Optional[float] = None
+    date: Optional[datetime] = None
     user_id: Optional[int] = None
     class Config:
         from_attributes = True
@@ -17,6 +19,15 @@ class Exercise_Create(BaseModel):
     sets: int
     reps: int
     weight: float
+    date: datetime
+    class Config:
+        from_attributes = True
+
+class TrainingSession_Response(BaseModel):
+    id: Optional[int] = None
+    date: Optional[datetime] = None
+    user_id: Optional[int] = None
+    exercises: List[Exersice_Response] = []
     class Config:
         from_attributes = True
 
@@ -25,7 +36,7 @@ class User_Response(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     is_active: Optional[bool] = True
-    exercises: List[Exersice_Response] = []
+    training_sessions: List[Exersice_Response] = []
     class Config:
         from_attributes = True
 
