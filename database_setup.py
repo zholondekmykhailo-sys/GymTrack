@@ -11,34 +11,43 @@ Base = declarative_base()
 #creating tables
 class User(Base):
     __tablename__ = 'users'
+
     id = Column(Integer, primary_key = True, index = True)
     name = Column(String, index = True)
     email = Column(String, unique = True, index = True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default = True)
-    training_sessions = relationship('Exercise', back_populates = 'user')
+
+    training_sessions = relationship('TrainingSession', back_populates = 'user')
+
 
 class Exercise(Base):
     __tablename__ = 'exercises'
+
     id = Column(Integer, primary_key = True, autoincrement=True, index = True)
     name = Column(String, index = True)
     sets = Column(Integer)
     reps = Column(Integer)
     weight = Column(Float)
-    date = Column(DateTime, default = dt.now())
     user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates = 'training_sessions')
-#    sessions = relationship('TrainingSession', back_populates = 'exercises')
+    
+    training_session_id = Column(Integer, ForeignKey('training_sessions.id'))
+    training_session = relationship('TrainingSession', back_populates = 'exercises')
 
-'''class TrainingSession(Base):
+
+class TrainingSession(Base):
     __tablename__ = 'training_sessions'
+
     id = Column(Integer, primary_key = True, autoincrement=True, index = True)
-    date = Column(DateTime, default = DateTime.now)
+    type = Column(String)
+    date = Column(DateTime, default = dt.now)
+
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates = 'training_sessions')
-    exercises = relationship('Exercise', back_populates = 'sessions')'''
 
-Base.metadata.create_all(engine)
+    exercises = relationship('Exercise', back_populates = 'training_session')
+
+Base.metadata.create_all(engine)    
 
 def get_db():
     db = SessionLocal()

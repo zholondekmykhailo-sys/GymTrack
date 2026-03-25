@@ -9,8 +9,8 @@ class Exersice_Response(BaseModel):
     sets: Optional[int] = None
     reps: Optional[int] = None
     weight: Optional[float] = None
-    date: Optional[datetime] = None
     user_id: Optional[int] = None
+    training_session_id: Optional[int] = None
     class Config:
         from_attributes = True
 
@@ -19,15 +19,29 @@ class Exercise_Create(BaseModel):
     sets: int
     reps: int
     weight: float
-    date: datetime
     class Config:
         from_attributes = True
 
 class TrainingSession_Response(BaseModel):
     id: Optional[int] = None
+    type: Optional[str] = None
     date: Optional[datetime] = None
     user_id: Optional[int] = None
     exercises: List[Exersice_Response] = []
+    class Config:
+        from_attributes = True
+
+class TrainingSession_Response_Simple(BaseModel):
+    id: Optional[int] = None
+    type: Optional[str] = None
+    date: Optional[datetime] = None
+    user_id: Optional[int] = None
+    class Config:
+        from_attributes = True
+
+class TrainingSession_Create(BaseModel):
+    type: str
+    date: datetime
     class Config:
         from_attributes = True
 
@@ -36,7 +50,7 @@ class User_Response(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     is_active: Optional[bool] = True
-    training_sessions: List[Exersice_Response] = []
+    training_sessions: List[TrainingSession_Response_Simple] = []
     class Config:
         from_attributes = True
 
