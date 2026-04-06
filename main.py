@@ -129,6 +129,34 @@ def add_exercise(
     db.refresh(new_exercise)
     return new_exercise
 
+#creating exercise for current training session (HTTP=POST, CRUD=CREATE)
+@app.post('/api/users/me/curr_training/exercises/', response_model=Exersice_Response, status_code=status.HTTP_201_CREATED)
+def add_exercise_to_current_session(
+    exercise: Exercise_Create,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+    ):
+    current_session = db.query(TrainingSession).filter(
+        TrainingSession.user_id == current_user.id,
+        TrainingSession.date >= datetime.datetime.now() - timedelta(hours=2)).first()
+
+    if not current_session:
+        raise HTTPException(status_code=404, detail='No training session found for the user')
+
+    new_exercise = Exercise(
+        name = exercise.name,
+        sets = exercise.sets,
+        reps = exercise.reps,
+        weight = exercise.weight,
+        user_id = current_user.id,
+        training_session_id = current_session.id
+    )
+
+    db.add(new_exercise)
+    db.commit()
+    db.refresh(new_exercise)
+    return new_exercise
+
 #delete exercise from training session (HTTP=DELETE, CRUD=DELETE)
 @app.delete('/api/users/me/training_sessions/{session_id}/exercises/{exercise_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_exercise(

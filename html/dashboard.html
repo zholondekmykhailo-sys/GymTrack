@@ -12,10 +12,6 @@
     <input type="number" name="reps" placeholder="reps" required />
     <input type="number" name="weight" placeholder="weight" required />
     <button type="submit">Add</button>
-  </form>
-  <form id="deleteForm">
-    <input type="number" name="exerciseId" placeholder="exercise id" required />
-    <input type="text" name="name" placeholder="exercise name" required />
     <button type="submit">Delete</button>
   </form>
 
@@ -61,7 +57,7 @@ form.addEventListener("submit", async (e) => {
   data.weight = Number(data.weight);
   data.date = new Date().toISOString();
 
-  await apiFetch("/api/users/me/exercises/", {
+  await apiFetch("/api/users/me/curr_training/exercises/", {
     method: "POST",
     body: JSON.stringify(data)
   });
